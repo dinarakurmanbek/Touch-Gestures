@@ -1,64 +1,43 @@
-const container = document.querySelector(".container");
-const coffees = [
-  {
-    name: "Perspiciatis",
-    image: "images/coffee1.jpg"
-  },
-  {
-    name: "Voluptatem",
-    image: "images/coffee2.jpg"
-  },
-  {
-    name: "Explicabo",
-    image: "images/coffee3.jpg"
-  },
-  {
-    name: "Rchitecto",
-    image: "images/coffee4.jpg"
-  },
-  {
-    name: " Beatae",
-    image: "images/coffee5.jpg"
-  },
-  {
-    name: " Vitae",
-    image: "images/coffee6.jpg"
-  },
-  {
-    name: "Inventore",
-    image: "images/coffee7.jpg"
-  },
-  {
-    name: "Veritatis",
-    image: "images/coffee8.jpg"
-  },
-  {
-    name: "Accusantium",
-    image: "images/coffee9.jpg"
+function startDrag(e) {
+  this.ontouchmove = this.onmspointermove = moveDrag;
+
+  this.ontouchend = this.onmspointerup = function () {
+    this.ontouchmove = this.onmspointermove = null;
+    this.ontouchend = this.onmspointerup = null;
   }
-];
-const showCoffees = () => {
-  let output = "";
-  coffees.forEach(
-    ({ name, image }) =>
-      (output += `
-              <div class="card">
-                <img class="card--avatar" src=${image} />
-                <h1 class="card--title">${name}</h1>
-                <a class="card--link" href="#">Taste</a>
-              </div>
-              `)
-  );
-  container.innerHTML = output;
-};
 
-document.addEventListener("DOMContentLoaded", showCoffees);
+  var pos = [this.offsetLeft, this.offsetTop];
+  var that = this;
+  var origin = getCoors(e);
 
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", function() {
-    navigator.serviceWorker
-      .register("/serviceWorker.js")
-      .then(res => console.log("service worker registered"))
-      .catch(err => console.log("service worker not registered", err));
-  });
+  function moveDrag(e) {
+    var currentPos = getCoors(e);
+    var deltaX = currentPos[0] - origin[0];
+    var deltaY = currentPos[1] - origin[1];
+    this.style.left = (pos[0] + deltaX) + 'px';
+    this.style.top = (pos[1] + deltaY) + 'px';
+    return false; // cancels scrolling
+  }
+
+  function getCoors(e) {
+    var coors = [];
+    if (e.targetTouches && e.targetTouches.length) {
+      var thisTouch = e.targetTouches[0];
+      coors[0] = thisTouch.clientX;
+      coors[1] = thisTouch.clientY;
+    } else {
+      coors[0] = e.clientX;
+      coors[1] = e.clientY;
+    }
+    return coors;
+  }
+}
+
+var elements = document.querySelectorAll('.test-element');
+[].forEach.call(elements, function (element) {
+  element.ontouchstart = element.onmspointerdown = startDrag;
+});
+
+document.ongesturechange = function () {
+  return false;
 }
